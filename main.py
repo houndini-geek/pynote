@@ -131,7 +131,7 @@ frame.pack(expand=True, fill='both')
 scrollbar = Scrollbar(frame)
 scrollbar.pack(side=RIGHT, fill=Y)
 
-textarea = Text(frame, wrap="none", yscrollcommand=scrollbar.set)
+textarea = Text(frame, wrap=WORD, yscrollcommand=scrollbar.set)
 textarea.config(bg="#010d18", foreground='#F1F1F1',
                  font=('Arial Baltic', 15),
                  insertbackground='#C1C1C1')
