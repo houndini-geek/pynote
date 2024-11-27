@@ -2,6 +2,7 @@ import os
 from tkinter import *
 from tkinter import filedialog, messagebox
 
+
 path = None
 # Get the user's home directory dynamically
 home_dir = os.path.expanduser("~")
@@ -113,10 +114,10 @@ root.resizable(width=False, height=False)
 # Create menu 
 menu_bar = Menu(root)
 
-file_menu = Menu(menu_bar, tearoff=0, bg='#232323', foreground='#ffffff')
+file_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 15))
 file_menu.add_command(label='New file', command=new_file)
 file_menu.add_command(label='Open file', command=open_file)
-file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, postcommand=update_recent_menu))
+file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, font=('Arial Narrow', 12),postcommand=update_recent_menu))
 file_menu.add_command(label='Save', command=save_file)
 file_menu.add_command(label='Save as...', command=save_as_file)
 file_menu.add_separator()
@@ -131,7 +132,9 @@ scrollbar = Scrollbar(frame)
 scrollbar.pack(side=RIGHT, fill=Y)
 
 textarea = Text(frame, wrap="none", yscrollcommand=scrollbar.set)
-textarea.config(bg="#262626", foreground='#F1F1F1', font='System', insertbackground='#C1C1C1')
+textarea.config(bg="#010d18", foreground='#F1F1F1',
+                 font=('Arial Baltic', 15),
+                 insertbackground='#C1C1C1')
 textarea.pack(expand=True, fill='both')
 
 scrollbar.config(command=textarea.yview)
