@@ -2,11 +2,18 @@ import os
 from tkinter import *
 from tkinter import filedialog, messagebox
 
-
 path = None
 # Get the user's home directory dynamically
 home_dir = os.path.expanduser("~")
 recent_file_path = os.path.join(home_dir, "recent-files.txt")
+
+def get_file_size(path=None):
+    if not path:
+        return
+    file_info = os.stat(path)
+    file_size_bytes = file_info.st_size
+    return file_size_bytes
+
 root = Tk()
 # Function to retrieve recent files from a text file
 def get_recent_files():
@@ -44,29 +51,36 @@ def new_file():
     path = None
     textarea.delete("1.0", END)
 
-def open_file(path=None):
-    #global path 
-    if not path:
-        path = filedialog.askopenfilename(
+def open_file(recent_path=None):
+     global path 
+     path = recent_path
+     if not path:
+      path = filedialog.askopenfilename(
             title="Open file",
             filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
         )
-    if path:
-     try:
-         save_to_recent_files(path)
-         root.title(f"Pynote: {path}")
+     if path:
+      try:
+         file_size = get_file_size(path) / 1024
+         root.title(f"Pynote: {path}:  File size: {file_size:.2f} KB")
          with open(path, 'r') as file:
                 content = file.read()
                 textarea.delete("1.0", END)
                 textarea.insert("1.0", content)
-     except UnicodeDecodeError:
+         save_to_recent_files(path)
+      except UnicodeDecodeError:
         messagebox.showerror("Error", "File type not supported.")
-     except FileNotFoundError:
+       
+      except FileNotFoundError:
         messagebox.showerror("Error", "File not found.")
-     except PermissionError:
+       
+      except PermissionError:
         messagebox.showerror("Error", "Permission denied.")
-     except Exception as e:
+     
+      except Exception as e:
         messagebox.showerror("Error", f"An unexpected error occurred: {e}")
+
+
 
 def save_file():
     global path
