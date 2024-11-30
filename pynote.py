@@ -151,7 +151,7 @@ menu_bar = Menu(root)
 file_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 12))
 file_menu.add_command(label='New file', command=new_file)
 file_menu.add_command(label='Open file', command=open_file)
-file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, font=('Arial Narrow', 12),postcommand=update_recent_menu))
+file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, font=('Arial Narrow', 12),bg='#001524', foreground='#ffffff', postcommand=update_recent_menu))
 file_menu.add_command(label='Save', command=save_file)
 file_menu.add_command(label='Save as...', command=save_as_file)
 file_menu.add_separator()
@@ -161,7 +161,11 @@ recent_menu = file_menu.children["!menu"]
 
 # Tools menu 
 tool_menu =  Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 12))
-tool_menu.add_command(label='Open PDF file',command=pdf_reader_handler)
+tool_menu.add_cascade(label='PDF tool',
+                      menu=Menu(file_menu,tearoff=0,
+                      font=('Arial Narrow', 12))
+                      )
+
 tool_menu.add_command(label='Open Docx file',command=docx_reader_handler)
 menu_bar.add_cascade(label='Tools', menu=tool_menu)
 
