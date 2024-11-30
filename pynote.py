@@ -1,6 +1,8 @@
 import os
 from tkinter import *
 from tkinter import filedialog, messagebox
+from pynote_tools import pdf_reader,docx_reader
+import pandas
 
 path = None
 # Get the user's home directory dynamically
@@ -121,6 +123,23 @@ def confirm_exit():
     root.destroy()
 
 
+def pdf_reader_handler():
+    pdf_data = pdf_reader()
+    if pdf_data.get('error'):
+          messagebox.showerror("Error", pdf_data["error"])
+    else:
+        textarea.delete("1.0", END)
+        textarea.insert("1.0", pdf_data["text"])
+        root.title(f"Pynote - {pdf_data['path']} - pages: {pdf_data['pages']}")
+
+def docx_reader_handler():
+    results = docx_reader()
+    file_size = get_file_size(results['path']) / 1024
+    root.title(f"Pynote: {results['path']}:  File size: {file_size:.2f} KB")
+    textarea.insert('0.1',results['text'])
+
+    
+
 root.title("Pynote")
 root.geometry("800x540")
 root.resizable(width=False, height=False)
@@ -138,6 +157,13 @@ file_menu.add_separator()
 file_menu.add_command(label='Exit', command=confirm_exit)
 menu_bar.add_cascade(label='File', menu=file_menu)
 recent_menu = file_menu.children["!menu"]
+
+# Tools menu 
+tool_menu =  Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 15))
+tool_menu.add_command(label='Open PDF file',command=pdf_reader_handler)
+tool_menu.add_command(label='Open Docx file',command=docx_reader_handler)
+menu_bar.add_cascade(label='Tools', menu=tool_menu)
+
 # Scrollbar setup
 frame = Frame(root)
 frame.pack(expand=True, fill='both')
