@@ -125,12 +125,13 @@ def confirm_exit():
 
 def pdf_reader_handler():
     pdf_data = pdf_reader()
+    file_size = get_file_size(pdf_data['path']) / 1024
     if pdf_data.get('error'):
           messagebox.showerror("Error", pdf_data["error"])
     else:
         textarea.delete("1.0", END)
         textarea.insert("1.0", pdf_data["text"])
-        root.title(f"Pynote - {pdf_data['path']} - pages: {pdf_data['pages']}")
+        root.title(f"Pynote - {pdf_data['path']} -File size: {file_size:.2f} KB  pages: {pdf_data['pages']}")
 
 def docx_reader_handler():
     results = docx_reader()
@@ -173,7 +174,7 @@ scrollbar.pack(side=RIGHT, fill=Y)
 
 textarea = Text(frame, wrap=WORD, yscrollcommand=scrollbar.set)
 textarea.config(bg="#010d18", foreground='#F1F1F1',
-                 font=('Arial Baltic', 15),
+                 font=('Arial Baltic', 12),
                  insertbackground='#C1C1C1')
 textarea.pack(expand=True, fill='both')
 
