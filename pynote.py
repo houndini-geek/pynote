@@ -143,12 +143,12 @@ def docx_reader_handler():
 
 root.title("Pynote")
 root.geometry("800x540")
-root.resizable(width=False, height=False)
+# root.resizable(width=False, height=False)
 
 # Create menu 
 menu_bar = Menu(root)
 
-file_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 15))
+file_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 12))
 file_menu.add_command(label='New file', command=new_file)
 file_menu.add_command(label='Open file', command=open_file)
 file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, font=('Arial Narrow', 12),postcommand=update_recent_menu))
@@ -160,7 +160,7 @@ menu_bar.add_cascade(label='File', menu=file_menu)
 recent_menu = file_menu.children["!menu"]
 
 # Tools menu 
-tool_menu =  Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 15))
+tool_menu =  Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 12))
 tool_menu.add_command(label='Open PDF file',command=pdf_reader_handler)
 tool_menu.add_command(label='Open Docx file',command=docx_reader_handler)
 menu_bar.add_cascade(label='Tools', menu=tool_menu)
@@ -175,8 +175,8 @@ scrollbar.pack(side=RIGHT, fill=Y)
 textarea = Text(frame, wrap=WORD, yscrollcommand=scrollbar.set)
 textarea.config(bg="#010d18", foreground='#F1F1F1',
                  font=('Arial Baltic', 12),
-                 insertbackground='#C1C1C1')
-textarea.pack(expand=True, fill='both')
+                 insertbackground='#C1C1C1',padx=4,pady=4)
+textarea.pack(expand=True, fill='both',side='top')
 
 scrollbar.config(command=textarea.yview)
 
