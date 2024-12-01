@@ -1,7 +1,7 @@
 import os
 from tkinter import *
 from tkinter import filedialog, messagebox
-from pynote_tools import pdf_reader,docx_reader
+from pynote_tools import pdf_reader, encrypt_pdf_file
 import pandas
 
 path = None
@@ -9,14 +9,10 @@ path = None
 home_dir = os.path.expanduser("~")
 recent_file_path = os.path.join(home_dir, "recent-files.txt")
 
-def get_file_size(path=None):
-    if not path:
-        return
-    file_info = os.stat(path)
-    file_size_bytes = file_info.st_size
-    return file_size_bytes
+
 
 root = Tk()
+
 # Function to retrieve recent files from a text file
 def get_recent_files():
     try:
@@ -25,6 +21,12 @@ def get_recent_files():
     except FileNotFoundError:
         return []
 
+def get_file_size(path=None):
+    if not path:
+        return
+    file_info = os.stat(path)
+    file_size_bytes = file_info.st_size
+    return file_size_bytes
 
 
 # Function to save the recent file path
@@ -52,6 +54,7 @@ def new_file():
     global path 
     path = None
     textarea.delete("1.0", END)
+
 
 def open_file(recent_path=None):
      global path 
@@ -133,11 +136,11 @@ def pdf_reader_handler():
         textarea.insert("1.0", pdf_data["text"])
         root.title(f"Pynote - {pdf_data['path']} -File size: {file_size:.2f} KB  pages: {pdf_data['pages']}")
 
-def docx_reader_handler():
-    results = docx_reader()
-    file_size = get_file_size(results['path']) / 1024
-    root.title(f"Pynote: {results['path']}:  File size: {file_size:.2f} KB")
-    textarea.insert('0.1',results['text'])
+# def docx_reader_handler():
+#     results = docx_reader()
+#     file_size = get_file_size(results['path']) / 1024
+#     root.title(f"Pynote: {results['path']}:  File size: {file_size:.2f} KB")
+#     textarea.insert('0.1',results['text'])
 
     
 
@@ -159,15 +162,22 @@ file_menu.add_command(label='Exit', command=confirm_exit)
 menu_bar.add_cascade(label='File', menu=file_menu)
 recent_menu = file_menu.children["!menu"]
 
-# Tools menu 
-tool_menu =  Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 12))
-tool_menu.add_cascade(label='PDF tool',
-                      menu=Menu(file_menu,tearoff=0,
-                      font=('Arial Narrow', 12))
-                      )
+# Tools menu
+tools_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
+menu_bar.add_cascade(label='Tools', menu=tools_menu)
 
-tool_menu.add_command(label='Open Docx file',command=docx_reader_handler)
-menu_bar.add_cascade(label='Tools', menu=tool_menu)
+
+# Adding options to PDF Tool submenu
+pdf_menu = Menu(tools_menu, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
+pdf_menu.add_command(label='Open PDF File', command=pdf_reader_handler)
+pdf_menu.add_command(label='Encrypt PDF File',command=encrypt_pdf_file)
+pdf_menu.add_command(label='Decrypt PDF File')
+
+docx_menu = Menu(tools_menu, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
+docx_menu.add_command(label='Open Docx file')
+# PDF Tool submenu inside Tools menu
+tools_menu.add_cascade(label='PDF Tool', menu=pdf_menu)
+tools_menu.add_cascade(label='Docx Tool', menu=docx_menu)
 
 # Scrollbar setup
 frame = Frame(root)
@@ -177,7 +187,7 @@ scrollbar = Scrollbar(frame)
 scrollbar.pack(side=RIGHT, fill=Y)
 
 textarea = Text(frame, wrap=WORD, yscrollcommand=scrollbar.set)
-textarea.config(bg="#010d18", foreground='#F1F1F1',
+textarea.config(bg="#020a11", foreground='#F1F1F1',
                  font=('Arial Baltic', 12),
                  insertbackground='#C1C1C1',padx=4,pady=4)
 textarea.pack(expand=True, fill='both',side='top')
