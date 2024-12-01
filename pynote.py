@@ -1,7 +1,7 @@
 import os
 from tkinter import *
 from tkinter import filedialog, messagebox
-from pynote_tools import pdf_reader, encrypt_pdf_file
+from pynote_tools import pdf_reader, encrypt_pdf_file, decrypt_pdf_file
 import pandas
 
 path = None
@@ -171,7 +171,7 @@ menu_bar.add_cascade(label='Tools', menu=tools_menu)
 pdf_menu = Menu(tools_menu, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
 pdf_menu.add_command(label='Open PDF File', command=pdf_reader_handler)
 pdf_menu.add_command(label='Encrypt PDF File',command=encrypt_pdf_file)
-pdf_menu.add_command(label='Decrypt PDF File')
+pdf_menu.add_command(label='Decrypt PDF File',command=decrypt_pdf_file)
 
 docx_menu = Menu(tools_menu, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
 docx_menu.add_command(label='Open Docx file')

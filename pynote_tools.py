@@ -1,8 +1,7 @@
 
 import pyautogui as pyauto
 from tkinter import filedialog
-from pypdf import PdfReader, PdfWriter
-from pypdf.errors import FileNotDecryptedError
+from PyPDF2 import PdfReader, PdfWriter
 
 
 def pdf_reader():
@@ -67,7 +66,7 @@ def encrypt_pdf_file():
             continue
         
         # Encrypt the file
-        encrypted_file.encrypt(password)
+        encrypted_file.encrypt(password,algorithm="AES-256")
         
         # Ask to save the encrypted file with a default filename and extension
         encrypted_file_path = filedialog.asksaveasfilename(
@@ -87,5 +86,65 @@ def encrypt_pdf_file():
         break
 
 
+
+def decrypt_pdf_file():
+    file_path = filedialog.askopenfilename(
+        title='Open PDF file to be Decrypted',
+        filetypes=[("PDF files", "*.pdf")]
+    )
+
+    if not file_path:
+        return
+
+    # Open the PDF and check if it is encrypted
+    file = PdfReader(file_path)
+
+    if file.is_encrypted:
+        # Ask for the decryption password
+        password = pyauto.password('Enter password to decrypt the PDF:')
+        
+        if not password:
+            pyauto.alert("No password provided. Decryption canceled.")
+            return
+        
+        try:
+            # Try to decrypt the PDF file with the provided password
+            file.decrypt(password)
+            
+            # If decryption was successful, we can proceed
+            writer = PdfWriter()
+
+            # Add all pages to the writer after decryption
+            for page in file.pages:
+                writer.add_page(page)
+
+            # Ask the user where to save the decrypted file
+            decrypted_file_path = filedialog.asksaveasfilename(
+                title="Save decrypted PDF file",
+                defaultextension='.pdf',
+                initialfile='decrypted_file.pdf'
+            )
+
+            if decrypted_file_path:
+                with open(decrypted_file_path, 'wb') as f:
+                    writer.write(f)
+                pyauto.alert("Decrypted PDF file saved!")
+                print("Decrypted PDF file saved!")
+            else:
+                pyauto.alert("Error: No file path provided for saving.")
+                print("Error: No file path provided.")
+
+        except Exception as e:
+            # If the password is incorrect, handle the error gracefully
+            pyauto.alert(f"Incorrect password! Unable to decrypt the file.{e}")
+            print("Incorrect password!")
+        
+        except Exception as e:
+            # Any other errors
+            pyauto.alert(f"Failed to decrypt the file. Error: {str(e)}")
+            print(f"Error during decryption: {e}")
+    else:
+        pyauto.alert("The PDF is not encrypted.")
+        print("File is not encrypted.")
 
 
