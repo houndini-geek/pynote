@@ -1,7 +1,28 @@
-
 import pyautogui as pyauto
-from tkinter import filedialog
+from tkinter import filedialog, messagebox
 from PyPDF2 import PdfReader, PdfWriter
+from docx2pdf import convert
+from random import randint
+
+def docx_to_pdf():
+    docx_file = filedialog.askopenfilename(title='Open docx file to be converted in PDF file',
+    filetypes=[("Docx files", "*.docx")]
+    )       
+
+    if not docx_file:
+        return print('File not selected')
+    
+    output_pdf_file = filedialog.askdirectory(title='Select where you want to save your PDF file')
+    if not output_pdf_file:
+        return
+    try:
+     messagebox.showinfo(title='Converting',message='Please wait while your file is being converted...')
+     convert(docx_file,f"{output_pdf_file}/pynote_{randint(100,400)}.pdf")
+     print('Docx file converted to PDF. Success !')
+     messagebox.showinfo(title="PDF file saved", message='Your file has been converted to PDF')
+    except Exception as e:
+       print(f"Failed to convert: {e}")
+       messagebox.showerror(title="Error saving PDF file", message=f"Failed to convert: {e}")
 
 
 def pdf_reader():
@@ -29,6 +50,9 @@ def pdf_reader():
         pdf_results['error'] = f"Failed to open PDF file: {e}"
     
     return pdf_results
+
+
+
 
 
 def encrypt_pdf_file():
@@ -146,5 +170,4 @@ def decrypt_pdf_file():
     else:
         pyauto.alert("The PDF is not encrypted.")
         print("File is not encrypted.")
-
 
