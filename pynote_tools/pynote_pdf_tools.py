@@ -4,6 +4,7 @@ from PyPDF2 import PdfReader, PdfWriter
 from docx2pdf import convert
 from random import randint
 
+
 def docx_to_pdf():
     docx_file = filedialog.askopenfilename(title='Open docx file to be converted in PDF file',
     filetypes=[("Docx files", "*.docx")]
@@ -16,8 +17,9 @@ def docx_to_pdf():
     if not output_pdf_file:
         return
     try:
+  
      messagebox.showinfo(title='Converting',message='Please wait while your file is being converted...')
-     convert(docx_file,f"{output_pdf_file}/pynote_{randint(100,400)}.pdf")
+     convert(docx_file,f"{output_pdf_file}/pynote-{randint(100,400)}.pdf")
      print('Docx file converted to PDF. Success !')
      messagebox.showinfo(title="PDF file saved", message='Your file has been converted to PDF')
     except Exception as e:

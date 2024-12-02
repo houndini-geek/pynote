@@ -2,7 +2,7 @@ import os
 from tkinter import *
 from tkinter import filedialog, messagebox
 from pynote_tools.pynote_pdf_tools import pdf_reader, encrypt_pdf_file, decrypt_pdf_file, docx_to_pdf
-from pynote_tools.pynote_docx_tools import docx_reader
+from pynote_tools.pynote_docx_tools import docx_reader,pdf_to_docx
 import pandas
 
 
@@ -190,7 +190,7 @@ pdf_menu.add_command(label='Decrypt PDF File',command=decrypt_pdf_file)
 
 docx_menu = Menu(tools_menu, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
 docx_menu.add_command(label='Open Docx file',command=docx_reader_handler)
-
+docx_menu.add_command(label='PDF to Docx',command=pdf_to_docx)
 # PDF Tool submenu inside Tools menu
 tools_menu.add_cascade(label='PDF Tool', menu=pdf_menu)
 tools_menu.add_cascade(label='Docx Tool', menu=docx_menu)
