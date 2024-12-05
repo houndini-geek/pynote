@@ -32,16 +32,16 @@ def pdf_reader():
     if not path:
         return {"error": "No file selected."}
     
-    reader = PdfReader(path)
   
-    pdf_results = {
-        "pages": 0,
-        "text": "",
-        "path": path,
-        "error": None
-    }
 
     try:
+        reader = PdfReader(path)
+  
+        pdf_results = {
+        "pages": 0,
+        "text": "",
+        "path": path
+    }
         pages = reader.pages
         pdf_results['pages'] = len(pages)
         
@@ -49,7 +49,8 @@ def pdf_reader():
             pdf_results['text'] += page.extract_text() + "\n"
         
     except Exception as e:
-        pdf_results['error'] = f"Failed to open PDF file: {e}"
+        messagebox.showerror(title="Failed to open PDF", message=f"Failed to open PDF file: {e}")
+        print(f"Failed to open PDF file: {e}")
     
     return pdf_results
 
@@ -63,11 +64,11 @@ def encrypt_pdf_file():
      filetypes=[("PDF files", "*.pdf")])
     if not file_path:
         return
-
+    
     # Check if the PDF is already encrypted
     reader = PdfReader(file_path)
     if reader.is_encrypted:
-        pyauto.alert("This PDF is already encrypted. Please select a different file.")
+        messagebox.showinfo(title='PDF file encrypted',message='This PDF is already encrypted.Please select a different file.')
         print("This PDF is already encrypted.")
         return
 
@@ -85,10 +86,12 @@ def encrypt_pdf_file():
         if password == "None":
             choice = pyauto.confirm('Do you want to cancel the encryption?', buttons=['Continue', 'Cancel'])
             if choice == 'Cancel':
-                pyauto.alert('Action canceled by the user.')
+                messagebox.showinfo(title='Encryption canceled',message='Action canceled by the user.')
+                print('Action canceled by the user')
                 return
         elif not password.strip():
-            pyauto.alert('Invalid password. Please try again.')
+            messagebox.showwarning(title='Invalid password', message='Invalid password. Please try again.')
+            print('Invalid password. Please try again')
             continue
         
         # Encrypt the file
@@ -104,13 +107,12 @@ def encrypt_pdf_file():
         if encrypted_file_path:
             with open(encrypted_file_path, 'wb') as f:
                 encrypted_file.write(f)
-            pyauto.alert("Encrypted PDF file saved!")
+            messagebox.showinfo(title='Ecryption success',message="Encrypted PDF file saved!")
             print("Encrypted PDF file saved!")
         else:
-            pyauto.alert("Error: No file path provided.")
+            messagebox.showerror(title='Error', message='No file path provided')
             print('Error: No file path provided.')
         break
-
 
 
 def decrypt_pdf_file():
@@ -131,6 +133,7 @@ def decrypt_pdf_file():
         
         if not password:
             pyauto.alert("No password provided. Decryption canceled.")
+            print('No password provided. Decryption canceled.')
             return
         
         try:

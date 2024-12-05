@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import filedialog, messagebox
 from pynote_tools.pynote_pdf_tools import pdf_reader, encrypt_pdf_file, decrypt_pdf_file, docx_to_pdf
 from pynote_tools.pynote_docx_tools import docx_reader,pdf_to_docx
-import pandas
+
 
 
 
@@ -79,15 +79,19 @@ def open_file(recent_path=None):
          save_to_recent_files(path)
       except UnicodeDecodeError:
         messagebox.showerror("Error", "File type not supported.")
+        print('File type not supported.')
        
       except FileNotFoundError:
         messagebox.showerror("Error", "File not found.")
+        print('File not found.')
        
       except PermissionError:
         messagebox.showerror("Error", "Permission denied.")
+        print('Permission denied')
      
       except Exception as e:
         messagebox.showerror("Error", f"An unexpected error occurred: {e}")
+        print(f"An unexpected error occured: {e}")
 
 
 
@@ -107,6 +111,7 @@ def save_file():
             root.title(f"Pynote: {path}")
     except Exception as e:
         messagebox.showwarning("File not saved", f"An error occurred: {e}")
+        print(f"File not saved. An error occurred: {e}")
 
 def save_as_file():
     global path
@@ -123,6 +128,7 @@ def save_as_file():
             root.title(f"Pynote: {path}")
     except Exception as e:
         messagebox.showwarning("File not saved", f"An error occurred: {e}")
+        print(f"File not saved. An error occurred: {e}")
 
 def confirm_exit():
     if messagebox.askyesno("Exit", "Do you want to save changes before exiting?"):
@@ -133,17 +139,12 @@ def confirm_exit():
 def pdf_reader_handler():
     pdf_data = pdf_reader()
     file_size = get_file_size(pdf_data['path']) / 1024
-    if pdf_data.get('error'):
-          messagebox.showerror("Error", pdf_data["error"])
-    else:
-        textarea.delete("1.0", END)
-        textarea.insert("1.0", pdf_data["text"])
-        root.title(f"Pynote - {pdf_data['path']} -File size: {file_size:.2f} KB  pages: {pdf_data['pages']}")
+    textarea.delete("1.0", END)
+    textarea.insert("1.0", pdf_data["text"])
+    root.title(f"Pynote - {pdf_data['path']} -File size: {file_size:.2f} KB  pages: {pdf_data['pages']}")
 
 def docx_reader_handler():
     results = docx_reader()
-    if not results['path']:
-        return
     file_size = get_file_size(results['path']) / 1024
     root.title(f"Pynote: {results['path']}:  File size: {file_size:.2f} KB")
     textarea.insert('1.0',results['text'])
@@ -163,10 +164,6 @@ file_menu.add_command(label='Open file', command=open_file)
 file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, font=('Arial Narrow', 12),bg='#001524', foreground='#ffffff', postcommand=update_recent_menu))
 file_menu.add_command(label='Save', command=save_file)
 file_menu.add_command(label='Save as...', command=save_as_file)
-options_menu =  Menu(file_menu, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
-options_menu.add_command(label='Save file as PDF')
-options_menu.add_command(label='Save file as Docx')
-file_menu.add_cascade(label='Options',menu=options_menu)
 file_menu.add_separator()
 file_menu.add_command(label='Exit', command=confirm_exit)
 menu_bar.add_cascade(label='File', menu=file_menu)
