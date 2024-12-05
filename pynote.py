@@ -1,14 +1,16 @@
 import os
-from tkinter import *
+from tkinter import Tk, Frame, Menu, Text,END, ttk
 from tkinter import filedialog, messagebox
 from pynote_tools.pynote_pdf_tools import pdf_reader, encrypt_pdf_file, decrypt_pdf_file, docx_to_pdf
 from pynote_tools.pynote_docx_tools import docx_reader,pdf_to_docx
-
+from keyboard import add_hotkey
+import pyperclip
 
 
 
 
 path = None
+
 # Get the user's home directory dynamically
 home_dir = os.path.expanduser("~")
 recent_file_path = os.path.join(home_dir, "recent-files.txt")
@@ -44,7 +46,7 @@ def save_to_recent_files(path):
 # Function to dynamically update recent files menu
 def update_recent_menu():
     recent_files = get_recent_files()
-    recent_menu.delete(0, END)
+    recent_menu.delete(0, 'end')
     if recent_files:
         for file_path in recent_files:
             recent_menu.add_command(label=file_path, command=lambda path=file_path: open_file(path))
@@ -57,6 +59,7 @@ def update_recent_menu():
 def new_file():
     global path 
     path = None
+    root.title("Pynote")
     textarea.delete("1.0", END)
 
 
@@ -66,9 +69,14 @@ def open_file(recent_path=None):
      if not path:
       path = filedialog.askopenfilename(
             title="Open file",
-            filetypes=[("Text files", "*.txt"), ("All files", "*.*")]
+            filetypes=[("All files", "*.*")]
         )
      if path:
+      base, ext = os.path.splitext(path)
+      if ext == '.pdf':
+          return messagebox.showinfo(title='PDF tool suggestion', message="It's look like you're trying to open a PDF file go to 'Tools> PDF tool> Open PDF file'")
+      elif ext == '.docx':
+            return messagebox.showinfo(title='Docx tool suggestion', message="It's look like you're trying to open a Docx file go to 'Tools> Docx tool> Open Docx file'")
       try:
          file_size = get_file_size(path) / 1024
          root.title(f"Pynote: {path}:  File size: {file_size:.2f} KB")
@@ -149,7 +157,34 @@ def docx_reader_handler():
     root.title(f"Pynote: {results['path']}:  File size: {file_size:.2f} KB")
     textarea.insert('1.0',results['text'])
 
-    
+
+
+
+def select_all():
+    textarea.tag_add('sel','1.0','end')
+    textarea.tag_config('sel',background='#F2F2F2',foreground='#363636')
+
+
+
+def copy_select():
+    try:
+        pyperclip.copy(textarea.selection_get())
+    except ValueError:
+        print('Select before copy!')
+
+def paste_select():
+    try:
+     textarea.insert('end', pyperclip.paste())
+    except ValueError:
+        print(f"failed to paste text !")
+
+
+def cut_select():
+    try:
+        pyperclip.copy(textarea.selection_get())
+        textarea.delete('sel.first', 'sel.last')
+    except ValueError:
+        print("failed to cut text")
 
 root.title("Pynote")
 root.geometry("800x540")
@@ -159,18 +194,33 @@ root.geometry("800x540")
 menu_bar = Menu(root)
 
 file_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff',font=('Arial Narrow', 12))
-file_menu.add_command(label='New file', command=new_file)
-file_menu.add_command(label='Open file', command=open_file)
-file_menu.add_cascade(label="Recent Files", menu=Menu(file_menu, tearoff=0, font=('Arial Narrow', 12),bg='#001524', foreground='#ffffff', postcommand=update_recent_menu))
-file_menu.add_command(label='Save', command=save_file)
-file_menu.add_command(label='Save as...', command=save_as_file)
+file_menu.add_command(label='New file (ctrl + n)', command=new_file)
+file_menu.add_command(label='Open file (ctrl + o)', command=open_file)
+file_menu.add_cascade(label="Recent Files",
+                       menu=Menu(file_menu, tearoff=0,
+                       font=('Arial Narrow', 12),
+                       bg='#001524',
+                       foreground='#ffffff',
+                       postcommand=update_recent_menu))
+
+file_menu.add_command(label='Save (ctrl + s)', command=save_file)
+file_menu.add_command(label='Save as... (ctrl + shift + s)', command=save_as_file)
 file_menu.add_separator()
-file_menu.add_command(label='Exit', command=confirm_exit)
+file_menu.add_command(label='Exit (ctrl + q)', command=confirm_exit)
 menu_bar.add_cascade(label='File', menu=file_menu)
 recent_menu = file_menu.children["!menu"]
 
 
-
+# Edits menu 
+edit_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
+edit_menu.add_command(label='Undo (ctrl + z)')
+edit_menu.add_command(label='Redo (ctrl + y)')
+edit_menu.add_command(label='Select all (ctrl + a)', command=select_all)
+edit_menu.add_separator()
+edit_menu.add_command(label='Copy (ctrl + c)', command=copy_select)
+edit_menu.add_command(label='Cut (ctrl + x)', command=cut_select)
+edit_menu.add_command(label='Paste (ctrl + v)',command=paste_select)
+menu_bar.add_cascade(labe='Edit', menu=edit_menu)
 
 # Tools menu
 tools_menu = Menu(menu_bar, tearoff=0, bg='#001524', foreground='#ffffff', font=('Arial Narrow', 12))
@@ -194,29 +244,52 @@ tools_menu.add_cascade(label='Docx Tool', menu=docx_menu)
 
 
 
-
-
-
-
-
-
-
-
-
 # Scrollbar setup
 frame = Frame(root)
 frame.pack(expand=True, fill='both')
 
-scrollbar = Scrollbar(frame)
-scrollbar.pack(side=RIGHT, fill=Y)
+scrollbar = ttk.Scrollbar(frame)
+scrollbar.pack(side='right', fill="y")
 
-textarea = Text(frame, wrap=WORD, yscrollcommand=scrollbar.set)
+textarea = Text(frame, wrap="word", yscrollcommand=scrollbar.set, undo=True, autoseparators=True)
 textarea.config(bg="#030c14", foreground='#F1F1F1',
-                 font=('Arial Baltic', 10),
+                 font=('Arial Baltic', 11),
                  insertbackground='#C1C1C1',padx=4,pady=4)
 textarea.pack(expand=True, fill='both',side='top')
 
 scrollbar.config(command=textarea.yview)
+
+
+
+# Keyboard Shorcuts 
+
+""""Shorcut to quit the app"""
+add_hotkey('ctrl+q', confirm_exit)
+    
+""""Shorcut to save existing file"""
+add_hotkey('ctrl+s', save_file)
+
+""""Shorcut to save a file copy"""
+add_hotkey('ctrl+shift+s', save_as_file)
+
+""""Shorcut to create a new file"""
+add_hotkey('ctrl+n', new_file)
+
+""""Shorcut to open a file"""
+add_hotkey('ctrl+o', open_file)
+
+""""Shorcut to select all text in a file"""
+add_hotkey('ctrl+a', select_all)
+
+""""Shorcut to copy text to clipboard"""
+add_hotkey('ctrl+c', copy_select)
+
+""""Shorcut to cut text to clipboard"""
+add_hotkey('ctrl+x', cut_select)
+
+""""Shorcut to paste text to clipboard"""
+add_hotkey('ctrl+v', paste_select)
+
 
 root.config(menu=menu_bar)
 root.mainloop()
